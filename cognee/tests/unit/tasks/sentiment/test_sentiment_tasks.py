@@ -40,9 +40,7 @@ async def test_extract_recent_interactions_returns_hydrated_models(monkeypatch):
     async def _fake_get_graph_engine():
         return fake_engine
 
-    extract_module = importlib.import_module(
-        "cognee.tasks.sentiment.extract_recent_interactions"
-    )
+    extract_module = importlib.import_module("cognee.tasks.sentiment.extract_recent_interactions")
     monkeypatch.setattr(extract_module, "get_graph_engine", _fake_get_graph_engine)
 
     interactions = await extract_module.extract_recent_interactions(data=None, last_k=5)
@@ -118,9 +116,7 @@ async def test_link_sentiment_to_interactions_creates_edges(monkeypatch):
     async def _fake_get_graph_engine():
         return _EdgeGraphEngine()
 
-    link_module = importlib.import_module(
-        "cognee.tasks.sentiment.link_sentiment_to_interactions"
-    )
+    link_module = importlib.import_module("cognee.tasks.sentiment.link_sentiment_to_interactions")
     monkeypatch.setattr(link_module, "get_graph_engine", _fake_get_graph_engine)
     monkeypatch.setattr(link_module, "index_graph_edges", _fake_index_graph_edges)
 

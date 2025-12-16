@@ -9,11 +9,16 @@ on:
 env:
   RUNTIME__LOG_LEVEL: ERROR
   ENV: 'dev'
+  LLM_MOCK_RESPONSES: 'true'
+  MOCK_EMBEDDING: 'true'
+  ENABLE_BACKEND_ACCESS_CONTROL: 'false'
+  REQUIRE_AUTHENTICATION: 'false'
 
 jobs:
   test-gemini:
     name: Run Gemini Test
     runs-on: ubuntu-22.04
+    if: ${{ secrets.GEMINI_API_KEY != '' }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -38,6 +43,7 @@ jobs:
   test-fastembed:
     name: Run Fastembed Test
     runs-on: ubuntu-22.04
+    if: ${{ secrets.LLM_API_KEY != '' }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -63,6 +69,7 @@ jobs:
   test-openrouter:
     name: Run OpenRouter Test
     runs-on: ubuntu-22.04
+    if: ${{ secrets.OPENROUTER_API_KEY != '' && secrets.OPENAI_API_KEY != '' }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

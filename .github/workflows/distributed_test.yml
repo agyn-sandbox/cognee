@@ -10,28 +10,35 @@ on:
         default: '3.11.x'
     secrets:
       LLM_MODEL:
-        required: true
+        required: false
       LLM_ENDPOINT:
-        required: true
+        required: false
       LLM_API_KEY:
-        required: true
+        required: false
       LLM_API_VERSION:
-        required: true
+        required: false
       EMBEDDING_MODEL:
-        required: true
+        required: false
       EMBEDDING_ENDPOINT:
-        required: true
+        required: false
       EMBEDDING_API_KEY:
-        required: true
+        required: false
       EMBEDDING_API_VERSION:
-        required: true
+        required: false
       OPENAI_API_KEY:
-        required: true
+        required: false
+
+env:
+  LLM_MOCK_RESPONSES: 'true'
+  MOCK_EMBEDDING: 'true'
+  ENABLE_BACKEND_ACCESS_CONTROL: 'false'
+  REQUIRE_AUTHENTICATION: 'false'
 
 jobs:
   run-server-start-test:
     name: Distributed Cognee test (Modal)
     runs-on: ubuntu-22.04
+    if: ${{ secrets.MODAL_TOKEN_ID != '' && secrets.MODAL_TOKEN_SECRET != '' && secrets.AZURE_POSTGRES_HOST != '' }}
     steps:
       - name: Check out
         uses: actions/checkout@v4
@@ -47,27 +54,27 @@ jobs:
       - name: Run Distributed Cognee (Modal)
         env:
           ENV: 'dev'
-          LLM_MODEL: ${{ secrets.LLM_MODEL }}
-          LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT }}
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          LLM_API_VERSION: ${{ secrets.LLM_API_VERSION }}
-          EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
-          EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT }}
-          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
-          EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
-          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
-          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
-          MODAL_SECRET_NAME: ${{ secrets.MODAL_SECRET_NAME }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL || 'gpt-4o-mini' }}
+          LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT || 'https://mock-llm.invalid' }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY || 'test-llm-key' }}
+          LLM_API_VERSION: ${{ secrets.LLM_API_VERSION || '2024-05-01' }}
+          EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL || 'text-embedding-3-small' }}
+          EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT || 'https://mock-embedding.invalid' }}
+          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY || 'test-embedding-key' }}
+          EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION || '2024-05-01' }}
+          MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID || 'test-modal-id' }}
+          MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET || 'test-modal-secret' }}
+          MODAL_SECRET_NAME: ${{ secrets.MODAL_SECRET_NAME || 'test-modal-secret-name' }}
           GRAPH_DATABASE_PROVIDER: "neo4j"
-          GRAPH_DATABASE_URL: ${{ secrets.AZURE_NEO4j_URL }}
-          GRAPH_DATABASE_USERNAME: ${{ secrets.AZURE_NEO4J_USERNAME }}
-          GRAPH_DATABASE_PASSWORD: ${{ secrets.AZURE_NEO4J_PW }}
+          GRAPH_DATABASE_URL: ${{ secrets.AZURE_NEO4j_URL || 'bolt://localhost:7687' }}
+          GRAPH_DATABASE_USERNAME: ${{ secrets.AZURE_NEO4J_USERNAME || 'neo4j' }}
+          GRAPH_DATABASE_PASSWORD: ${{ secrets.AZURE_NEO4J_PW || 'test-password' }}
           DB_PROVIDER: "postgres"
-          DB_NAME: ${{ secrets.AZURE_POSTGRES_DB_NAME }}
-          DB_HOST: ${{ secrets.AZURE_POSTGRES_HOST }}
-          DB_PORT: ${{ secrets.AZURE_POSTGRES_PORT }}
-          DB_USERNAME: ${{ secrets.AZURE_POSTGRES_USERNAME }}
-          DB_PASSWORD: ${{ secrets.AZURE_POSTGRES_PW }}
+          DB_NAME: ${{ secrets.AZURE_POSTGRES_DB_NAME || 'cognee' }}
+          DB_HOST: ${{ secrets.AZURE_POSTGRES_HOST || 'localhost' }}
+          DB_PORT: ${{ secrets.AZURE_POSTGRES_PORT || '5432' }}
+          DB_USERNAME: ${{ secrets.AZURE_POSTGRES_USERNAME || 'postgres' }}
+          DB_PASSWORD: ${{ secrets.AZURE_POSTGRES_PW || 'postgres' }}
           VECTOR_DB_PROVIDER: "pgvector"
           COGNEE_DISTRIBUTED: "true"
         run: uv run modal run ./distributed/entrypoint.py

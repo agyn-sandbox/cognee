@@ -9,29 +9,33 @@ on:
         default: '3.11.x'
     secrets:
       LLM_PROVIDER:
-        required: true
+        required: false
       LLM_MODEL:
-        required: true
+        required: false
       LLM_ENDPOINT:
-        required: true
+        required: false
       LLM_API_KEY:
-        required: true
+        required: false
       LLM_API_VERSION:
-        required: true
+        required: false
       EMBEDDING_PROVIDER:
-        required: true
+        required: false
       EMBEDDING_MODEL:
-        required: true
+        required: false
       EMBEDDING_ENDPOINT:
-        required: true
+        required: false
       EMBEDDING_API_KEY:
-        required: true
+        required: false
       EMBEDDING_API_VERSION:
-        required: true
+        required: false
 
 env:
   RUNTIME__LOG_LEVEL: ERROR
   ENV: 'dev'
+  LLM_MOCK_RESPONSES: 'true'
+  MOCK_EMBEDDING: 'true'
+  ENABLE_BACKEND_ACCESS_CONTROL: 'false'
+  REQUIRE_AUTHENTICATION: 'false'
 
 jobs:
 
@@ -76,17 +80,18 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       ENV: 'dev'
-      LLM_PROVIDER: openai
-      LLM_MODEL: ${{ secrets.LLM_MODEL }}
-      LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT }}
-      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-      LLM_API_VERSION: ${{ secrets.LLM_API_VERSION }}
+      LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'openai' }}
+      LLM_MODEL: ${{ secrets.LLM_MODEL || 'gpt-4o-mini' }}
+      LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT || 'https://mock-llm.invalid' }}
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY || 'test-llm-key' }}
+      LLM_API_VERSION: ${{ secrets.LLM_API_VERSION || '2024-05-01' }}
+      LLM_MOCK_RESPONSES: 'true'
 
-      EMBEDDING_PROVIDER: openai
-      EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
-      EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT }}
-      EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
-      EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
+      EMBEDDING_PROVIDER: ${{ secrets.EMBEDDING_PROVIDER || 'openai' }}
+      EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL || 'text-embedding-3-small' }}
+      EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT || 'https://mock-embedding.invalid' }}
+      EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY || 'test-embedding-key' }}
+      EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION || '2024-05-01' }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -106,15 +111,16 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       ENV: 'dev'
-      LLM_PROVIDER: openai
-      LLM_MODEL: ${{ secrets.LLM_MODEL }}
-      LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT }}
-      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-      LLM_API_VERSION: ${{ secrets.LLM_API_VERSION }}
-      EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
-      EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT }}
-      EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
-      EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
+      LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'openai' }}
+      LLM_MODEL: ${{ secrets.LLM_MODEL || 'gpt-4o-mini' }}
+      LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT || 'https://mock-llm.invalid' }}
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY || 'test-llm-key' }}
+      LLM_API_VERSION: ${{ secrets.LLM_API_VERSION || '2024-05-01' }}
+      LLM_MOCK_RESPONSES: 'true'
+      EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL || 'text-embedding-3-small' }}
+      EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT || 'https://mock-embedding.invalid' }}
+      EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY || 'test-embedding-key' }}
+      EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION || '2024-05-01' }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -135,17 +141,18 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       ENV: 'dev'
-      LLM_PROVIDER: openai
-      LLM_MODEL: ${{ secrets.LLM_MODEL }}
-      LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT }}
-      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-      LLM_API_VERSION: ${{ secrets.LLM_API_VERSION }}
+      LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'openai' }}
+      LLM_MODEL: ${{ secrets.LLM_MODEL || 'gpt-4o-mini' }}
+      LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT || 'https://mock-llm.invalid' }}
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY || 'test-llm-key' }}
+      LLM_API_VERSION: ${{ secrets.LLM_API_VERSION || '2024-05-01' }}
+      LLM_MOCK_RESPONSES: 'true'
 
-      EMBEDDING_PROVIDER: openai
-      EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
-      EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT }}
-      EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
-      EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
+      EMBEDDING_PROVIDER: ${{ secrets.EMBEDDING_PROVIDER || 'openai' }}
+      EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL || 'text-embedding-3-small' }}
+      EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT || 'https://mock-embedding.invalid' }}
+      EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY || 'test-embedding-key' }}
+      EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION || '2024-05-01' }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -166,23 +173,24 @@ jobs:
     env:
       ENV: 'dev'
       STRUCTURED_OUTPUT_FRAMEWORK: "BAML"
-      BAML_LLM_PROVIDER: openai
-      BAML_LLM_MODEL: ${{ secrets.OPENAI_MODEL }}
-      BAML_LLM_ENDPOINT: ${{ secrets.OPENAI_ENDPOINT }}
-      BAML_LLM_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      BAML_LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'openai' }}
+      BAML_LLM_MODEL: ${{ secrets.LLM_MODEL || 'gpt-4o-mini' }}
+      BAML_LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT || 'https://mock-llm.invalid' }}
+      BAML_LLM_API_KEY: ${{ secrets.LLM_API_KEY || 'test-llm-key' }}
 #      BAML_LLM_API_VERSION: ${{ secrets.LLM_API_VERSION }}
 
-      LLM_PROVIDER: openai
-      LLM_MODEL: ${{ secrets.LLM_MODEL }}
-      LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT }}
-      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-      LLM_API_VERSION: ${{ secrets.LLM_API_VERSION }}
+      LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'openai' }}
+      LLM_MODEL: ${{ secrets.LLM_MODEL || 'gpt-4o-mini' }}
+      LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT || 'https://mock-llm.invalid' }}
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY || 'test-llm-key' }}
+      LLM_API_VERSION: ${{ secrets.LLM_API_VERSION || '2024-05-01' }}
+      LLM_MOCK_RESPONSES: 'true'
 
-      EMBEDDING_PROVIDER: openai
-      EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
-      EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT }}
-      EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
-      EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
+      EMBEDDING_PROVIDER: ${{ secrets.EMBEDDING_PROVIDER || 'openai' }}
+      EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL || 'text-embedding-3-small' }}
+      EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT || 'https://mock-embedding.invalid' }}
+      EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY || 'test-embedding-key' }}
+      EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION || '2024-05-01' }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

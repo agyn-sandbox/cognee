@@ -34,13 +34,13 @@ jobs:
       - name: Run Temporal Graph with Kuzu (lancedb + sqlite)
         env:
           ENV: 'dev'
-          LLM_MODEL: ${{ secrets.OPENAI_MODEL }}
-          LLM_ENDPOINT: ${{ secrets.OPENAI_ENDPOINT }}
-          LLM_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
-          EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT }}
-          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
-          EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
+          LLM_MODEL: ${{ secrets.OPENAI_MODEL || 'gpt-4o-mini' }}
+          LLM_ENDPOINT: ${{ secrets.OPENAI_ENDPOINT || 'https://mock-llm.invalid' }}
+          LLM_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-llm-key' }}
+          EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL || 'text-embedding-3-small' }}
+          EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT || 'https://mock-embedding.invalid' }}
+          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY || 'test-embedding-key' }}
+          EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION || '2024-05-01' }}
           GRAPH_DATABASE_PROVIDER: 'kuzu'
           VECTOR_DB_PROVIDER: 'lancedb'
           DB_PROVIDER: 'sqlite'
@@ -72,13 +72,13 @@ jobs:
       - name: Run Temporal Graph with Neo4j (lancedb + sqlite)
         env:
           ENV: 'dev'
-          LLM_MODEL: ${{ secrets.OPENAI_MODEL }}
-          LLM_ENDPOINT: ${{ secrets.OPENAI_ENDPOINT }}
-          LLM_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
-          EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT }}
-          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
-          EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
+          LLM_MODEL: ${{ secrets.OPENAI_MODEL || 'gpt-4o-mini' }}
+          LLM_ENDPOINT: ${{ secrets.OPENAI_ENDPOINT || 'https://mock-llm.invalid' }}
+          LLM_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-llm-key' }}
+          EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL || 'text-embedding-3-small' }}
+          EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT || 'https://mock-embedding.invalid' }}
+          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY || 'test-embedding-key' }}
+          EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION || '2024-05-01' }}
           GRAPH_DATABASE_PROVIDER: 'neo4j'
           VECTOR_DB_PROVIDER: 'lancedb'
           DB_PROVIDER: 'sqlite'
@@ -123,13 +123,13 @@ jobs:
         - name: Run Temporal Graph with Kuzu (postgres + pgvector)
           env:
             ENV: dev
-            LLM_MODEL: ${{ secrets.OPENAI_MODEL }}
-            LLM_ENDPOINT: ${{ secrets.OPENAI_ENDPOINT }}
-            LLM_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-            EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
-            EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT }}
-            EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
-            EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
+            LLM_MODEL: ${{ secrets.OPENAI_MODEL || 'gpt-4o-mini' }}
+            LLM_ENDPOINT: ${{ secrets.OPENAI_ENDPOINT || 'https://mock-llm.invalid' }}
+            LLM_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-llm-key' }}
+            EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL || 'text-embedding-3-small' }}
+            EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT || 'https://mock-embedding.invalid' }}
+            EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY || 'test-embedding-key' }}
+            EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION || '2024-05-01' }}
             GRAPH_DATABASE_PROVIDER: 'kuzu'
             VECTOR_DB_PROVIDER: 'pgvector'
             DB_PROVIDER: 'postgres'
@@ -189,13 +189,13 @@ jobs:
       - name: Run Temporal Graph with Neo4j (postgres + pgvector)
         env:
           ENV: dev
-          LLM_MODEL: ${{ secrets.OPENAI_MODEL }}
-          LLM_ENDPOINT: ${{ secrets.OPENAI_ENDPOINT }}
-          LLM_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
-          EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT }}
-          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
-          EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
+          LLM_MODEL: ${{ secrets.OPENAI_MODEL || 'gpt-4o-mini' }}
+          LLM_ENDPOINT: ${{ secrets.OPENAI_ENDPOINT || 'https://mock-llm.invalid' }}
+          LLM_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-llm-key' }}
+          EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL || 'text-embedding-3-small' }}
+          EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT || 'https://mock-embedding.invalid' }}
+          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY || 'test-embedding-key' }}
+          EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION || '2024-05-01' }}
           GRAPH_DATABASE_PROVIDER: 'neo4j'
           VECTOR_DB_PROVIDER: 'pgvector'
           DB_PROVIDER: 'postgres'
@@ -208,3 +208,8 @@ jobs:
           DB_USERNAME: cognee
           DB_PASSWORD: cognee
         run: uv run python ./cognee/tests/test_temporal_graph.py
+env:
+  LLM_MOCK_RESPONSES: 'true'
+  MOCK_EMBEDDING: 'true'
+  ENABLE_BACKEND_ACCESS_CONTROL: 'false'
+  REQUIRE_AUTHENTICATION: 'false'
