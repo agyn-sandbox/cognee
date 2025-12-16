@@ -157,13 +157,37 @@ class LanceDBAdapter(VectorDBInterface):
 
         collection = await self.get_collection(collection_name)
 
-        data_vectors = await self.embed_data(
-            [DataPoint.get_embeddable_data(data_point) for data_point in data_points]
-        )
+        vector_size = self.embedding_engine.get_vector_size()
+        zero_vector = [0.0] * vector_size
+
+        embeddable_values = [
+            DataPoint.get_embeddable_data(data_point) for data_point in data_points
+        ]
+        texts_to_embed: list[str] = []
+        indices_to_embed: list[int] = []
+        data_vectors: list[list[float]] = [zero_vector.copy() for _ in data_points]
+
+        for index, value in enumerate(embeddable_values):
+            if value is None:
+                continue
+
+            if isinstance(value, str):
+                prepared_value = value.strip()
+                if not prepared_value:
+                    continue
+            else:
+                prepared_value = str(value)
+
+            texts_to_embed.append(prepared_value)
+            indices_to_embed.append(index)
+
+        if texts_to_embed:
+            embedded_vectors = await self.embed_data(texts_to_embed)
+            for idx, vector in zip(indices_to_embed, embedded_vectors):
+                data_vectors[idx] = vector
 
         IdType = TypeVar("IdType")
         PayloadSchema = TypeVar("PayloadSchema")
-        vector_size = self.embedding_engine.get_vector_size()
 
         class LanceDataPoint(LanceModel, Generic[IdType, PayloadSchema]):
             """
