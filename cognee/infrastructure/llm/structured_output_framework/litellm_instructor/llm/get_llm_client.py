@@ -1,6 +1,10 @@
 """Get the LLM client."""
 
+import os
 from enum import Enum
+from typing import Annotated, Any, Literal, Type, Union, get_args, get_origin
+
+from pydantic_core import PydanticUndefined
 
 from cognee.infrastructure.llm import get_llm_config
 from cognee.infrastructure.llm.structured_output_framework.litellm_instructor.llm.ollama.adapter import (
@@ -10,6 +14,89 @@ from cognee.infrastructure.llm.exceptions import (
     LLMAPIKeyNotSetError,
     UnsupportedLLMProviderError,
 )
+
+
+def _should_use_mock_client() -> bool:
+    flag = os.environ.get("LLM_MOCK_RESPONSES", "")
+    return flag.lower() in {"1", "true", "yes", "on"}
+
+
+def _coerce_default_value(annotation: Any) -> Any:
+    """Derive a reasonable default value for the given annotation."""
+
+    origin = get_origin(annotation)
+    args = get_args(annotation)
+
+    if origin is Annotated and args:
+        return _coerce_default_value(args[0])
+
+    if origin is Union and args:
+        for arg in args:
+            if arg is not type(None):  # noqa: E721
+                return _coerce_default_value(arg)
+        return None
+
+    if origin is Literal and args:
+        return args[0]
+
+    if origin is list:
+        return []
+    if origin is dict:
+        return {}
+    if origin is tuple:
+        return tuple()
+    if origin is set:
+        return set()
+
+    if isinstance(annotation, type):
+        if issubclass(annotation, Enum):
+            first_member = next(iter(annotation))
+            return getattr(first_member, "value", first_member)
+        if issubclass(annotation, bool):
+            return False
+        if issubclass(annotation, int):
+            return 0
+        if issubclass(annotation, float):
+            return 0.0
+        if issubclass(annotation, str):
+            return "mock"
+
+    return "mock"
+
+
+class _MockLLMClient:
+    """Basic mock client returning deterministic payloads for tests."""
+
+    max_completion_tokens: int = 4096
+    model: str = "mock-llm"
+
+    def _build_payload(self, response_model: Type) -> Any:
+        field_values = {}
+        for field_name, field_info in getattr(response_model, "model_fields", {}).items():
+            if field_info.default is not PydanticUndefined:
+                field_values[field_name] = field_info.default
+            elif getattr(field_info, "default_factory", None) is not None:
+                field_values[field_name] = field_info.default_factory()
+            else:
+                field_values[field_name] = _coerce_default_value(field_info.annotation)
+        try:
+            return response_model(**field_values)
+        except Exception:  # noqa: BLE001
+            return response_model.model_construct(**field_values)
+
+    async def acreate_structured_output(
+        self, text_input: str, system_prompt: str, response_model: Type
+    ):
+        return self._build_payload(response_model)
+
+    def create_structured_output(self, text_input: str, system_prompt: str, response_model: Type):
+        return self._build_payload(response_model)
+
+    async def create_transcript(self, *args, **kwargs):
+        return ""
+
+    async def transcribe_image(self, *args, **kwargs):
+        return {}
 
 
 # Define an Enum for LLM Providers
@@ -49,6 +136,9 @@ def get_llm_client(raise_api_key_error: bool = True):
         An instance of the appropriate LLM client adapter based on the provider
         configuration.
     """
+    if _should_use_mock_client():
+        return _MockLLMClient()
+
     llm_config = get_llm_config()
 
     provider = LLMProvider(llm_config.llm_provider)

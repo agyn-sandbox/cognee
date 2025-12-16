@@ -1,0 +1,12 @@
+Analyze the following user interaction between a user and Cognee.
+
+Question:
+{question}
+
+Answer:
+{answer}
+
+Retrieved Context:
+{context}
+
+Determine the overall sentiment of the user's experience.

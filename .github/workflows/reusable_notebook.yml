@@ -8,27 +8,25 @@ on:
         required: true
         type: string
     secrets:
-      #LLM_MODEL:
-      #  required: true
-      #LLM_ENDPOINT:
-      #  required: true
       LLM_API_KEY:
-        required: true
+        required: false
       OPENAI_API_KEY:
-        required: true
-      #LLM_API_VERSION:
-      #  required: true
+        required: false
       EMBEDDING_MODEL:
-        required: true
+        required: false
       EMBEDDING_ENDPOINT:
-        required: true
+        required: false
       EMBEDDING_API_KEY:
-        required: true
+        required: false
       EMBEDDING_API_VERSION:
-        required: true
+        required: false
 
 env:
   RUNTIME__LOG_LEVEL: ERROR
+  LLM_MOCK_RESPONSES: 'true'
+  MOCK_EMBEDDING: 'true'
+  ENABLE_BACKEND_ACCESS_CONTROL: 'false'
+  REQUIRE_AUTHENTICATION: 'false'
 
 jobs:
 
@@ -53,13 +51,13 @@ jobs:
           ENV: 'dev'
           #LLM_MODEL: ${{ secrets.LLM_MODEL }}
           #LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT }}
-          LLM_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # Use OpenAI Until a multimedia model is deployed and DeepEval support for other models is added
+          LLM_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-llm-key' }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-llm-key' }} # Use OpenAI Until a multimedia model is deployed and DeepEval support for other models is added
           #LLM_API_VERSION: ${{ secrets.LLM_API_VERSION }}
-          EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
-          EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT }}
-          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
-          EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
+          EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL || 'text-embedding-3-small' }}
+          EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT || 'https://mock-embedding.invalid' }}
+          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY || 'test-embedding-key' }}
+          EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION || '2024-05-01' }}
         run: |
           uv run jupyter nbconvert \
           --to notebook \

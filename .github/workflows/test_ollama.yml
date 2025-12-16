@@ -90,7 +90,7 @@ jobs:
 
       - name: Run example test
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'test-llm-key' }}
           PYTHONFAULTHANDLER: 1
           LLM_PROVIDER: "ollama"
           LLM_API_KEY: "ollama"

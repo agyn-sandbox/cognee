@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Tuple
 from uuid import UUID, uuid5, NAMESPACE_OID
 
+from pydantic import BaseModel
+
 from cognee.infrastructure.llm import LLMGateway
 from cognee.infrastructure.llm.prompts.read_query_prompt import read_query_prompt
 from cognee.shared.logging_utils import get_logger
@@ -12,6 +14,10 @@ from .models import FeedbackEnrichment
 
 
 logger = get_logger("extract_feedback_interactions")
+
+
+class ContextSummary(BaseModel):
+    summary: str
 
 
 def _filter_negative_feedback(feedback_nodes):
@@ -101,9 +107,10 @@ async def _generate_human_readable_context_summary(
     try:
         prompt = read_query_prompt("feedback_user_context_prompt.txt")
         rendered = prompt.format(question=question_text, context=raw_context_text)
-        return await LLMGateway.acreate_structured_output(
-            text_input=rendered, system_prompt="", response_model=str
+        response = await LLMGateway.acreate_structured_output(
+            text_input=rendered, system_prompt="", response_model=ContextSummary
         )
+        return response.summary.strip()
     except Exception as exc:  # noqa: BLE001
         logger.warning("Failed to summarize context", error=str(exc))
         return raw_context_text or ""

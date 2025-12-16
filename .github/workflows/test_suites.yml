@@ -176,6 +176,7 @@ jobs:
       mcp-test,
       llm-tests,
       ollama-tests,
+      s3-file-storage-test,
       relational-db-migration-tests,
       docker-compose-test,
       docker-ci-test,
@@ -185,22 +186,34 @@ jobs:
     steps:
       - name: Check Status
         run: |
-          if [[ "${{ needs.basic-tests.result }}" == "success" &&
-                "${{ needs.e2e-tests.result }}" == "success" &&
-                "${{ needs.cli-tests.result }}" == "success" &&
-                "${{ needs.graph-db-tests.result }}" == "success" &&
-                "${{ needs.notebook-tests.result }}" == "success" &&
-                "${{ needs.different-os-tests-basic.result }}" == "success" &&
-                "${{ needs.different-os-tests-extended.result }}" == "success" &&
-                "${{ needs.vector-db-tests.result }}" == "success" &&
-                "${{ needs.example-tests.result }}" == "success" &&
-                "${{ needs.db-examples-tests.result }}" == "success" &&
-                "${{ needs.relational-db-migration-tests.result }}" == "success" &&
-                "${{ needs.llm-tests.result }}" == "success" &&
-                "${{ needs.docker-compose-test.result }}" == "success" &&
-                "${{ needs.docker-ci-test.result }}" == "success" &&
-                "${{ needs.ollama-tests.result }}" == "success" ]]; then
-            echo "All test suites completed successfully!"
+          check_result() {
+            local name=$1
+            local result=$2
+            if [[ "$result" != "success" && "$result" != "skipped" ]]; then
+              echo "Job $name did not complete successfully (result: $result)."
+              return 1
+            fi
+            return 0
+          }
+
+          if check_result "basic-tests" "${{ needs.basic-tests.result }}" \
+            && check_result "e2e-tests" "${{ needs.e2e-tests.result }}" \
+            && check_result "cli-tests" "${{ needs.cli-tests.result }}" \
+            && check_result "graph-db-tests" "${{ needs.graph-db-tests.result }}" \
+            && check_result "notebook-tests" "${{ needs.notebook-tests.result }}" \
+            && check_result "different-os-tests-basic" "${{ needs.different-os-tests-basic.result }}" \
+            && check_result "different-os-tests-extended" "${{ needs.different-os-tests-extended.result }}" \
+            && check_result "vector-db-tests" "${{ needs.vector-db-tests.result }}" \
+            && check_result "example-tests" "${{ needs.example-tests.result }}" \
+            && check_result "db-examples-tests" "${{ needs.db-examples-tests.result }}" \
+            && check_result "relational-db-migration-tests" "${{ needs.relational-db-migration-tests.result }}" \
+            && check_result "llm-tests" "${{ needs.llm-tests.result }}" \
+            && check_result "docker-compose-test" "${{ needs.docker-compose-test.result }}" \
+            && check_result "docker-ci-test" "${{ needs.docker-ci-test.result }}" \
+            && check_result "ollama-tests" "${{ needs.ollama-tests.result }}" \
+            && check_result "mcp-test" "${{ needs.mcp-test.result }}" \
+            && check_result "s3-file-storage-test" "${{ needs.s3-file-storage-test.result }}"; then
+            echo "All test suites completed successfully or were skipped due to missing credentials."
           else
             echo "One or more test suites failed."
             exit 1

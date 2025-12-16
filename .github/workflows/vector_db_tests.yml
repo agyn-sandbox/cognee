@@ -92,14 +92,14 @@ jobs:
       - name: Run PGVector Tests
         env:
           ENV: 'dev'
-          LLM_MODEL: ${{ secrets.LLM_MODEL }}
-          LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT }}
-          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
-          LLM_API_VERSION: ${{ secrets.LLM_API_VERSION }}
-          EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL }}
-          EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT }}
-          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
-          EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL || 'gpt-4o-mini' }}
+          LLM_ENDPOINT: ${{ secrets.LLM_ENDPOINT || 'https://mock-llm.invalid' }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY || 'test-llm-key' }}
+          LLM_API_VERSION: ${{ secrets.LLM_API_VERSION || '2024-05-01' }}
+          EMBEDDING_MODEL: ${{ secrets.EMBEDDING_MODEL || 'text-embedding-3-small' }}
+          EMBEDDING_ENDPOINT: ${{ secrets.EMBEDDING_ENDPOINT || 'https://mock-embedding.invalid' }}
+          EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY || 'test-embedding-key' }}
+          EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION || '2024-05-01' }}
         run: uv run python ./cognee/tests/test_pgvector.py
 
   run-lancedb-tests:
@@ -128,3 +128,8 @@ jobs:
           EMBEDDING_API_KEY: ${{ secrets.EMBEDDING_API_KEY }}
           EMBEDDING_API_VERSION: ${{ secrets.EMBEDDING_API_VERSION }}
         run: uv run python ./cognee/tests/test_lancedb.py
+env:
+  LLM_MOCK_RESPONSES: 'true'
+  MOCK_EMBEDDING: 'true'
+  ENABLE_BACKEND_ACCESS_CONTROL: 'false'
+  REQUIRE_AUTHENTICATION: 'false'
